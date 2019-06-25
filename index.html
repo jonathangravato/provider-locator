@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/css/uikit.min.css" />
+
+  <title>Provider Locator</title>
+</head>
+<body>
+  <div class="uk-section-xlarge">
+    <div class="uk-container uk-container-center">
+      <div class="uk-grid">
+        <div class="uk-width-1-3">
+          <form id="distance_form" class="uk-margin-bottom">
+            <div class="uk-margin-bottom">
+              <label>Client Address: </label>
+              <input class="uk-input" id="from_places" placeholder="Enter a location" />
+              <input id="origin" name="origin" required="" type="hidden" />
+            </div>
+            <input class="uk-button uk-button-primary" type="submit" value="Find Local Providers" />
+          </form>
+        </div>
+        <div class="uk-width-2-3">
+          <div id="result">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+
+      var provider_list = [];
+      var distance_list = [];
+
+      function initMap() {
+          // add input listeners
+          var from_places = new google.maps.places.Autocomplete(document.getElementById('from_places'));
+          var to_places = new google.maps.places.Autocomplete(document.getElementById('to_places'));
+
+          google.maps.event.addListener(from_places, 'place_changed', function () {
+              var from_place = from_places.getPlace();
+              var from_address = from_place.formatted_address;
+              $('#origin').val(from_address);
+          });
+
+          google.maps.event.addListener(to_places, 'place_changed', function () {
+              var to_place = to_places.getPlace();
+              var to_address = to_place.formatted_address;
+              $('#destination').val(to_address);
+          });
+
+      }
+
+      function getProviders() {
+        var return_data;
+        $.ajax({
+          url: 'medical-providers.json',
+          dataType: 'json',
+          type: 'get',
+          cache: false,
+          success: function(data) {
+            return_data = data;
+            findProviders(return_data);
+          }
+        });
+      }
+
+      function findProviders(data){
+        var providers = data.providers;
+        provider_list.push(providers);
+        var origin = $('#origin').val();
+        var destination;
+        var service = new google.maps.DistanceMatrixService();
+        $.each(providers, function(index, value){
+          destination = value.address;
+          service.getDistanceMatrix({
+              origins: [origin],
+              destinations: [destination],
+              travelMode: google.maps.TravelMode.DRIVING,
+              unitSystem: google.maps.UnitSystem.IMPERIAL, // miles and feet.
+              // unitSystem: google.maps.UnitSystem.metric, // kilometers and meters.
+              avoidHighways: false,
+              avoidTolls: false
+          }, returnLocal);
+        });
+      }
+
+      function returnLocal(response, status) {
+          if (status != google.maps.DistanceMatrixStatus.OK) {
+              $('#result').html(err);
+          } else {
+              //console.log(response);
+              var origin = response.originAddresses[0];
+              var destination = response.destinationAddresses[0];
+              if (response.rows[0].elements[0].status === "ZERO_RESULTS") {
+                  $('#result').html("Better get on a plane. There are no roads between "  + origin + " and " + destination);
+              } else {
+                  var distance = response.rows[0].elements[0].distance.text;
+                  //console.log(distance);
+                  distance_list.push(
+                  {["distance"]:  distance}
+                  );
+              }
+          }
+      }
+
+      $('#distance_form').submit(function(e){
+          e.preventDefault();
+
+          getProviders();
+
+          console.log(provider_list);
+          console.log(distance_list);
+
+      });
+
+  </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&language=en&key=AIzaSyCe6KKticCtrsT6aCAApiwfPHy_TLcrfgg&callback=initMap"  type="text/javascript"></script>
+</body>
+</html>

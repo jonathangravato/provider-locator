@@ -1,0 +1,43 @@
+{
+  "providers" : [
+     {
+       "zipcode": "32114",
+       "city": "Daytona Beach",
+       "provider-group": "Preferred Injury Physician",
+       "provider": "",
+       "specialty": "Chiropractic ",
+       "address": "337 N Clyde Morris Blvd  Daytona Beach  FL 32114",
+       "phone": "386-265-7246",
+       "Fax": "(386) 265-4908",
+       "website": "https://pipdoc.com/",
+       "working-days": "",
+       "notes": ""
+     },
+     {
+       "zipcode": "32117",
+       "city": "Daytona Beach (Holly Hill Plaza) ",
+       "provider-group": "AdvantaCare",
+       "provider": "",
+       "specialty": "",
+       "address": "1040 Mason Avenue Daytona Beach  Florida 32117",
+       "phone": "(386) 248-0107",
+       "Fax": "(386) 248-0109",
+       "website": "",
+       "working-days": "",
+       "notes": ""
+     },
+     {
+       "zipcode": "32137",
+       "city": "Palm Coast",
+       "provider-group": "AdvantaCare",
+       "provider": "",
+       "specialty": "",
+       "address": "9 Pine Cone Drive  Suite 104A Palm Coast  FL  32137",
+       "phone": "(386) 597-2520",
+       "Fax": "(386) 597-7032",
+       "website": "",
+       "working-days": "",
+       "notes": ""
+     }
+  ]
+}
