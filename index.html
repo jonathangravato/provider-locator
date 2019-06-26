@@ -36,7 +36,6 @@
 
   <script>
 
-      var provider_list = [];
       var distance_list = [];
 
       function initMap() {
@@ -73,8 +72,14 @@
       }
 
       function findProviders(data){
-        var providers = data.providers;
-        provider_list.push(providers);
+
+        window.providers = data.providers;
+
+      }
+
+      function calculateDistance() {
+
+        providers = window.providers;
         var origin = $('#origin').val();
         var destination;
         var service = new google.maps.DistanceMatrixService();
@@ -90,6 +95,9 @@
               avoidTolls: false
           }, returnLocal);
         });
+
+        console.log(window.providers);
+
       }
 
       function returnLocal(response, status) {
@@ -102,23 +110,26 @@
               if (response.rows[0].elements[0].status === "ZERO_RESULTS") {
                   $('#result').html("Better get on a plane. There are no roads between "  + origin + " and " + destination);
               } else {
-                  var distance = response.rows[0].elements[0].distance.text;
-                  //console.log(distance);
-                  distance_list.push(
-                  {["distance"]:  distance}
-                  );
+                  var distance = response.rows[0].elements[0].distance.value;
+
+                  console.log(distance);
+
+                  var mileage = Math.round(distance * 0.000621371192);
+
+                  console.log(mileage);
+
               }
           }
       }
 
       $('#distance_form').submit(function(e){
           e.preventDefault();
+          calculateDistance();
+      });
 
-          getProviders();
-
-          console.log(provider_list);
-          console.log(distance_list);
-
+      $(document).ready( function(){
+        console.log('ready!');
+        getProviders();
       });
 
   </script>
