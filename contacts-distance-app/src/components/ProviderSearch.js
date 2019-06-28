@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 // import { styled } from '@material-ui/styles';
-import { Paper, Grid, Button, TextField } from '@material-ui/core';
+import { Paper, Grid, Button, TextField, CircularProgress } from '@material-ui/core';
 import blue from '@material-ui/core/colors/blue';
 import { MEDICAL_PROVIDERS } from '../medical-providers';
 import axios from 'axios';
@@ -63,7 +63,10 @@ const useStyles = makeStyles(theme => ({
   button: {
     color: '#fff',
     backgroundColor: primary
-  }
+  },
+  progress: {
+    margin: theme.spacing(2),
+  },
 }));
 
 export default function ProviderSearch() {
@@ -71,6 +74,7 @@ export default function ProviderSearch() {
   const [providers, setProviders] = useState([])
   const [fields, setFields] = useState(FIELD_VALUES)
   const [clickedSearch, setSearchFlag] = useState(false)
+  const [isSearching, setSearchingFlag] = useState(false)
 
   const callGoogleApi = async (destination, limit) => {
     let isLessThanDistanceLimit = false;
@@ -86,14 +90,18 @@ export default function ProviderSearch() {
   }
 
   const filterProvidersByDistance = () => {
-    MEDICAL_PROVIDERS.forEach(async (provider) => {
+    setFields(FIELD_VALUES)
+    setSearchingFlag(true)
+    MEDICAL_PROVIDERS.forEach(async (provider, index) => {
       const meetsLImit = await callGoogleApi(provider.address, 10)
       if (meetsLImit) {
         setProviders(state => [...state, provider])
       }
+      if( (index + 1) === MEDICAL_PROVIDERS.length){
+        setSearchFlag(true)
+        setSearchingFlag(false)
+      }
     })
-    setSearchFlag(true)
-    setFields(FIELD_VALUES)
   }
 
   const renderProviders = providers => providers.map((provider, index) => (
@@ -126,6 +134,9 @@ export default function ProviderSearch() {
               {/* { JSON.stringify(fields.origin) } */}
               {
                 clickedSearch ? providers.length > 0 ? renderProviders(providers) : <p>No Results Found</p> : null
+              }
+              {
+                isSearching ? <CircularProgress className={classes.progress} /> : null
               }
             </div>
           </Paper>
