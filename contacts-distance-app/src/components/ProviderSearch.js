@@ -84,7 +84,7 @@ export default function ProviderSearch() {
       })
       .catch(err => {
         console.log(err)                     //Axios entire error message
-        console.log(err.response.data.error) //Google API error message 
+        // console.log(err.response.data.error) //Google API error message 
       })
     return isLessThanDistanceLimit;
   }
