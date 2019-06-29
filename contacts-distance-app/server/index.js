@@ -17,7 +17,7 @@ app.get('/api/map-data/:origin/:destination', (req, res) => {
     axios.get(URL)
       .then(response => {
         const miles = getMiles(response.data.rows[0].elements[0].distance.value);
-        res.status(200).json({ miles, destination });
+        res.status(200).json({ miles });
       })
       .catch(err => {
         console.log(err)                     //Axios entire error message

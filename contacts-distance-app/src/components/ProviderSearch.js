@@ -78,20 +78,20 @@ export default function ProviderSearch() {
 
   useEffect(() => {
     // Function to fetch Github info of a user.
-    const fetchGoogMapsInfo = async (url) => {
+    const fetchGoogMapsInfo = async (url, provider) => {
       const googMapsInfo = await axios(url) // API call to get user info from Github.
       return {
-        miles: googMapsInfo.data.miles,
-        destination: googMapsInfo.data.destination
+        ...provider,
+        miles: googMapsInfo.data.miles
       }
     }
 
     // Iterates all users and returns their Github info.
-    const fetchProviderDistances = async (addresses) => {
+    const fetchProviderDistances = async (providers) => {
       const origin = 'Orlando, Fl'
-      const requests = addresses.map((address) => {
-        const url = `/api/map-data/${origin}/${address}`
-        return fetchGoogMapsInfo(url) // Async function that fetches the user info.
+      const requests = providers.map((provider) => {
+        const url = `/api/map-data/${origin}/${provider.address}`
+        return fetchGoogMapsInfo(url, provider) // Async function that fetches the user info.
           .then((a) => {
             return a // Returns the user info.
           })
@@ -99,9 +99,12 @@ export default function ProviderSearch() {
       return Promise.all(requests) // Waiting for all the requests to get resolved.
     }
 
-    const providerAddresses = MEDICAL_PROVIDERS.map( pr => pr.address )
-    fetchProviderDistances(providerAddresses)
-      .then(a => console.log(JSON.stringify(a)))
+    fetchProviderDistances(MEDICAL_PROVIDERS)
+      .then(a => {
+        if(a.length > 0){
+          setProviders(a)
+        }
+      })
   })
 
   const callGoogleApi = async (destination, limit) => {
@@ -159,12 +162,15 @@ export default function ProviderSearch() {
               <Grid item xs={12}>
                 <Button className={classes.button} onClick={() => filterProvidersByDistance()}>Search</Button>
               </Grid>
-              {/* { JSON.stringify(fields.origin) } */}
+              {/* { JSON.stringify(providers.length) } */}
               {
                 clickedSearch ? providers.length > 0 ? renderProviders(providers) : <p>No Results Found</p> : null
               }
               {
                 isSearching ? <CircularProgress className={classes.progress} /> : null
+              }
+              {
+                providers.length > 0 ? renderProviders(providers.filter( pr => pr.miles < 10 )) : null
               }
             </div>
           </Paper>
