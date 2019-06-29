@@ -76,6 +76,37 @@ export default function ProviderSearch() {
   const [clickedSearch, setSearchFlag] = useState(false)
   const [isSearching, setSearchingFlag] = useState(false)
 
+  useEffect(() => {
+    // Function to fetch Github info of a user.
+    const fetchGoogMapsInfo = async (url, provider) => {
+      const googMapsInfo = await axios(url) // API call to get user info from Github.
+      return {
+        ...provider,
+        miles: googMapsInfo.data.miles
+      }
+    }
+
+    // Iterates all users and returns their Github info.
+    const fetchProviderDistances = async (providers) => {
+      const origin = 'Orlando, Fl'
+      const requests = providers.map((provider) => {
+        const url = `/api/map-data/${origin}/${provider.address}`
+        return fetchGoogMapsInfo(url, provider) // Async function that fetches the user info.
+          .then((a) => {
+            return a // Returns the user info.
+          })
+      })
+      return Promise.all(requests) // Waiting for all the requests to get resolved.
+    }
+
+    fetchProviderDistances(MEDICAL_PROVIDERS)
+      .then(a => {
+        if(a.length > 0){
+          setProviders(a)
+        }
+      })
+  })
+
   const callGoogleApi = async (destination, limit) => {
     let isLessThanDistanceLimit = false;
     await axios.get(`/api/map-data/${fields.origin}/${destination}`)
