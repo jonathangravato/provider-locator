@@ -1,11 +1,11 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const pino = require('express-pino-logger')();
+// const bodyParser = require('body-parser');
+// const pino = require('express-pino-logger')();
 const axios = require('axios');
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(pino);
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(pino);
 
 function getMiles(i) {
   return parseFloat((i*0.000621371192).toFixed(2))
@@ -17,7 +17,7 @@ app.get('/api/map-data/:origin/:destination', (req, res) => {
     axios.get(URL)
       .then(response => {
         const miles = getMiles(response.data.rows[0].elements[0].distance.value);
-        res.status(200).json({ miles });
+        res.status(200).json({ miles, destination });
       })
       .catch(err => {
         console.log(err)                     //Axios entire error message

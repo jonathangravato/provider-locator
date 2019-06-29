@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 // import { styled } from '@material-ui/styles';
 import { Paper, Grid, Button, TextField, CircularProgress } from '@material-ui/core';
@@ -76,6 +76,34 @@ export default function ProviderSearch() {
   const [clickedSearch, setSearchFlag] = useState(false)
   const [isSearching, setSearchingFlag] = useState(false)
 
+  useEffect(() => {
+    // Function to fetch Github info of a user.
+    const fetchGoogMapsInfo = async (url) => {
+      const googMapsInfo = await axios(url) // API call to get user info from Github.
+      return {
+        miles: googMapsInfo.data.miles,
+        destination: googMapsInfo.data.destination
+      }
+    }
+
+    // Iterates all users and returns their Github info.
+    const fetchProviderDistances = async (addresses) => {
+      const origin = 'Orlando, Fl'
+      const requests = addresses.map((address) => {
+        const url = `/api/map-data/${origin}/${address}`
+        return fetchGoogMapsInfo(url) // Async function that fetches the user info.
+          .then((a) => {
+            return a // Returns the user info.
+          })
+      })
+      return Promise.all(requests) // Waiting for all the requests to get resolved.
+    }
+
+    const providerAddresses = MEDICAL_PROVIDERS.map( pr => pr.address )
+    fetchProviderDistances(providerAddresses)
+      .then(a => console.log(JSON.stringify(a)))
+  })
+
   const callGoogleApi = async (destination, limit) => {
     let isLessThanDistanceLimit = false;
     await axios.get(`/api/map-data/${fields.origin}/${destination}`)
@@ -97,7 +125,7 @@ export default function ProviderSearch() {
       if (meetsLImit) {
         setProviders(state => [...state, provider])
       }
-      if( (index + 1) === MEDICAL_PROVIDERS.length){
+      if ((index + 1) === MEDICAL_PROVIDERS.length) {
         setSearchFlag(true)
         setSearchingFlag(false)
       }
