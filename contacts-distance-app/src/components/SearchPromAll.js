@@ -105,7 +105,7 @@ export default function ProviderSearch() {
           setProviders(a)
         }
       })
-  })
+  }, [])
 
   const callGoogleApi = async (destination, limit) => {
     let isLessThanDistanceLimit = false;
