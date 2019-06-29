@@ -10,14 +10,9 @@ const primary = blue[500]; // #F44336
 const FIELD_VALUES = { origin: '', limit: 10 }
 // const TEST_ADDRESS = '505 White St, Daytona Beach, FL 32114'
 
-// const StyledTextField = styled(TextField)({
-//   marginLeft: 8,
-//   marginRight: 8,
-//   marginBottom: 50,
-//   width: 450,
-//   'div:after': {
-//     borderBottom: 'red'
-//   }
+// const StyledButton = styled(Button)({
+//   color: '#fff',
+//   backgroundColor: '#b7410e'
 // });
 
 const useStyles = makeStyles(theme => ({
@@ -54,11 +49,6 @@ const useStyles = makeStyles(theme => ({
     marginRight: theme.spacing(1),
     marginBottom: 50,
     width: 450
-  },
-  MuiInput: {
-    underline: {
-      after: primary
-    }
   },
   button: {
     color: '#fff',
