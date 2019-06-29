@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import ProviderSearch from './components/ProviderSearch';
+import SearchPromAll from './components/SearchPromAll';
 import NotFound from './components/NotFound';
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
       <div>
         <Switch>
           <Route exact path="/" component={ProviderSearch} />
+          <Route exact path="/promall" component={SearchPromAll} />
           <Route component={NotFound} />
         </Switch>
       </div>
