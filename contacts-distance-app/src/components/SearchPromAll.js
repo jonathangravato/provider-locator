@@ -123,8 +123,8 @@ export default function ProviderSearch() {
   }
 
   const changeHandler = ev => {
-    const { value } = ev.target
-    setFields( fields => ({ ...fields, origin: value }))
+    const { name, value } = ev.target
+    setFields( fields => ({ ...fields, [name]: value }))
   }
 
   return (
@@ -136,9 +136,20 @@ export default function ProviderSearch() {
               <h3>Providers Distance App</h3>
               <Grid item xs={12}>
                 <TextField
+                  name="origin"
                   label="Address"
                   className={classes.textField}
                   value={fields.origin}
+                  onChange={changeHandler}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  name="limit"
+                  label="Mile Limit"
+                  className={classes.textField}
+                  value={fields.limit}
                   onChange={changeHandler}
                   margin="normal"
                 />
