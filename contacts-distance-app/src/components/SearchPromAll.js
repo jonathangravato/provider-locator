@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 // import { styled } from '@material-ui/styles';
 import { Paper, Grid, Button, TextField, CircularProgress } from '@material-ui/core';
@@ -73,10 +73,8 @@ export default function ProviderSearch() {
   const classes = useStyles();
   const [providers, setProviders] = useState([])
   const [fields, setFields] = useState(FIELD_VALUES)
-  const [clickedSearch, setSearchFlag] = useState(false)
   const [isSearching, setSearchingFlag] = useState(false)
 
-  useEffect(() => {
     // Function to fetch Github info of a user.
     const fetchGoogMapsInfo = async (url, provider) => {
       const googMapsInfo = await axios(url) // API call to get user info from Github.
@@ -87,10 +85,9 @@ export default function ProviderSearch() {
     }
 
     // Iterates all users and returns their Github info.
-    const fetchProviderDistances = async (providers) => {
-      const origin = 'Orlando, Fl'
-      const requests = providers.map((provider) => {
-        const url = `/api/map-data/${origin}/${provider.address}`
+    const fetchProviderDistances = async () => {
+      const requests = MEDICAL_PROVIDERS.map((provider) => {
+        const url = `/api/map-data/${fields.origin}/${provider.address}`
         return fetchGoogMapsInfo(url, provider) // Async function that fetches the user info.
           .then((a) => {
             return a // Returns the user info.
@@ -99,49 +96,36 @@ export default function ProviderSearch() {
       return Promise.all(requests) // Waiting for all the requests to get resolved.
     }
 
-    fetchProviderDistances(MEDICAL_PROVIDERS)
-      .then(a => {
-        if(a.length > 0){
-          setProviders(a)
-        }
-      })
-  }, [])
-
-  const callGoogleApi = async (destination, limit) => {
-    let isLessThanDistanceLimit = false;
-    await axios.get(`/api/map-data/${fields.origin}/${destination}`)
-      .then(response => {
-        isLessThanDistanceLimit = response.data.miles < limit;
-      })
-      .catch(err => {
-        console.log(err)                     //Axios entire error message
-        // console.log(err.response.data.error) //Google API error message 
-      })
-    return isLessThanDistanceLimit;
-  }
-
   const filterProvidersByDistance = () => {
-    setFields(FIELD_VALUES)
-    setSearchingFlag(true)
-    MEDICAL_PROVIDERS.forEach(async (provider, index) => {
-      const meetsLImit = await callGoogleApi(provider.address, 10)
-      if (meetsLImit) {
-        setProviders(state => [...state, provider])
-      }
-      if ((index + 1) === MEDICAL_PROVIDERS.length) {
-        setSearchFlag(true)
-        setSearchingFlag(false)
-      }
-    })
+    // setFields(FIELD_VALUES)
+
+    if(fields.origin.length > 5) {
+      setSearchingFlag(true)
+      fetchProviderDistances()
+        .then(prs => {
+          if(prs.length > 0){
+            setProviders(prs)
+            setSearchingFlag(false)
+          }
+        })
+    }
   }
 
-  const renderProviders = providers => providers.map((provider, index) => (
-    <div key={provider.zipcode + `${index}`}>
-      <h5>{provider.providerGroup}</h5>
-      <p>{provider.address}</p>
-      <p>{provider.city}</p>
-    </div>
-  ))
+  const renderProviders = () => {
+    const filteredProviders = providers.filter( pr => pr.miles < fields.limit )
+    return filteredProviders.map((provider, index) => (
+      <div key={provider.zipcode + `${index}`}>
+        <h5>{provider.providerGroup}</h5>
+        <p>{provider.address}</p>
+        <p>{provider.city}</p>
+      </div>
+    ))
+  }
+
+  const changeHandler = ev => {
+    const { value } = ev.target
+    setFields( fields => ({ ...fields, origin: value }))
+  }
 
   return (
     <div className={classes.root}>
@@ -155,7 +139,7 @@ export default function ProviderSearch() {
                   label="Address"
                   className={classes.textField}
                   value={fields.origin}
-                  onChange={event => setFields({ origin: event.target.value })}
+                  onChange={changeHandler}
                   margin="normal"
                 />
               </Grid>
@@ -164,13 +148,10 @@ export default function ProviderSearch() {
               </Grid>
               {/* { JSON.stringify(providers.length) } */}
               {
-                clickedSearch ? providers.length > 0 ? renderProviders(providers) : <p>No Results Found</p> : null
+                providers.length > 0 ? renderProviders() : null // <p>No Results Found</p> 
               }
               {
                 isSearching ? <CircularProgress className={classes.progress} /> : null
-              }
-              {
-                providers.length > 0 ? renderProviders(providers.filter( pr => pr.miles < 10 )) : null
               }
             </div>
           </Paper>
