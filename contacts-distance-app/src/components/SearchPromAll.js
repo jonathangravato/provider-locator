@@ -8,6 +8,7 @@ import axios from 'axios';
 
 const primary = blue[500]; // #F44336
 const FIELD_VALUES = { origin: '', limit: 10 }
+const ERROR_VALUES = { originError: false, originText: '', limitError: false, limitText: '' }
 // const TEST_ADDRESS = '505 White St, Daytona Beach, FL 32114'
 
 // const StyledTextField = styled(TextField)({
@@ -79,6 +80,7 @@ export default function ProviderSearch() {
   const classes = useStyles();
   const [providers, setProviders] = useState([])
   const [fields, setFields] = useState(FIELD_VALUES)
+  const [errors, setErrors] = useState(ERROR_VALUES)
   const [isSearching, setSearchingFlag] = useState(false)
 
     // Function to fetch Github info of a user.
@@ -103,9 +105,9 @@ export default function ProviderSearch() {
     }
 
   const filterProvidersByDistance = () => {
-    // setFields(FIELD_VALUES)
-
-    if(fields.origin.length > 5) {
+    setErrors(ERROR_VALUES)
+    if(fields.origin.length > 5 && fields.limit > 0) {
+      setFields(FIELD_VALUES)
       setSearchingFlag(true)
       fetchProviderDistances()
         .then(prs => {
@@ -114,6 +116,10 @@ export default function ProviderSearch() {
             setSearchingFlag(false)
           }
         })
+    } else if(fields.origin.length < 5) {
+      setErrors( errors => ({ ...errors, originError: true, originText: 'Enter 5 or more characters' }))
+    } else if(fields.limit === 0 || fields.limit === '') {
+      setErrors( errors => ({ ...errors, limitError: true, limitText: 'Enter at least 1 mile distance' }))
     }
   }
 
@@ -130,7 +136,7 @@ export default function ProviderSearch() {
 
   const changeHandler = ev => {
     const { name, value } = ev.target
-    setFields( fields => ({ ...fields, [name]: value }))
+    setFields( fields => ({ ...fields, [name]: name === 'limit' && value.length > 0 ? Number(value) : value }))
   }
 
   return (
@@ -144,6 +150,8 @@ export default function ProviderSearch() {
                 <TextField
                   name="origin"
                   label="Address"
+                  error={errors.originError}
+                  helperText={errors.originText}
                   className={classes.addressField}
                   value={fields.origin}
                   onChange={changeHandler}
@@ -154,6 +162,8 @@ export default function ProviderSearch() {
                 <TextField
                   name="limit"
                   label="Mile Limit"
+                  error={errors.limitError}
+                  helperText={errors.limitText}
                   className={classes.limitField}
                   value={fields.limit}
                   onChange={changeHandler}
