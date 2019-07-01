@@ -8,7 +8,7 @@ import axios from 'axios';
 
 const primary = blue[500]; // #F44336
 const FIELD_VALUES = { origin: '', limit: 10 }
-const ERROR_VALUES = { originError: false, originText: '', limitError: false, limitText: '' }
+const ERROR_VALUES = { originError: false, originText: '', limitError: false, limitText: '', noProviders: false }
 // const TEST_ADDRESS = '505 White St, Daytona Beach, FL 32114'
 
 // const StyledTextField = styled(TextField)({
@@ -106,6 +106,7 @@ export default function ProviderSearch() {
 
   const filterProvidersByDistance = () => {
     setErrors(ERROR_VALUES)
+    setProviders([])
     if(fields.origin.length > 5 && fields.limit > 0) {
       setFields(FIELD_VALUES)
       setSearchingFlag(true)
@@ -125,18 +126,22 @@ export default function ProviderSearch() {
 
   const renderProviders = () => {
     const filteredProviders = providers.filter( pr => pr.miles < fields.limit )
-    return filteredProviders.map((provider, index) => (
-      <div key={provider.zipcode + `${index}`}>
-        <h5>{provider.providerGroup}</h5>
-        <p>{provider.address}</p>
-        <p>{provider.city}</p>
-      </div>
-    ))
+    if(filteredProviders.length > 0) {
+      return filteredProviders.map((provider, index) => (
+        <div key={provider.zipcode + `${index}`}>
+          <h5>{provider.providerGroup}</h5>
+          <p>{provider.address}</p>
+          <p>{provider.city}</p>
+        </div>
+      ))
+    } else if (filteredProviders.length === 0) {
+      setErrors({ ...errors, noProviders: true })
+    }
   }
 
   const changeHandler = ev => {
     const { name, value } = ev.target
-    setFields( fields => ({ ...fields, [name]: name === 'limit' && value.length > 0 ? Number(value) : value }))
+    setFields({ ...fields, [name]: name === 'limit' && value.length > 0 ? Number(value) : value })
   }
 
   return (
@@ -175,10 +180,13 @@ export default function ProviderSearch() {
               </Grid>
               {/* { JSON.stringify(providers.length) } */}
               {
-                providers.length > 0 ? renderProviders() : null // <p>No Results Found</p> 
+                providers.length > 0 && !errors.noProviders ? renderProviders() : null
               }
               {
                 isSearching ? <CircularProgress className={classes.progress} /> : null
+              }
+              {
+                errors.noProviders ? <p>No Results Found</p> : null
               }
             </div>
           </Paper>
