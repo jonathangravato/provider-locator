@@ -49,7 +49,13 @@ const useStyles = makeStyles(theme => ({
     textAlign: 'center',
     color: theme.palette.text.secondary,
   },
-  textField: {
+  addressField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    marginBottom: 20,
+    width: 450
+  },
+  limitField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
     marginBottom: 50,
@@ -138,7 +144,7 @@ export default function ProviderSearch() {
                 <TextField
                   name="origin"
                   label="Address"
-                  className={classes.textField}
+                  className={classes.addressField}
                   value={fields.origin}
                   onChange={changeHandler}
                   margin="normal"
@@ -148,7 +154,7 @@ export default function ProviderSearch() {
                 <TextField
                   name="limit"
                   label="Mile Limit"
-                  className={classes.textField}
+                  className={classes.limitField}
                   value={fields.limit}
                   onChange={changeHandler}
                   margin="normal"
