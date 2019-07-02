@@ -3,8 +3,10 @@ import { makeStyles } from '@material-ui/core/styles';
 // import { styled } from '@material-ui/styles';
 import { Paper, Grid, Button, TextField, CircularProgress } from '@material-ui/core';
 import blue from '@material-ui/core/colors/blue';
-import { MEDICAL_PROVIDERS } from '../medical-providers';
 import axios from 'axios';
+import List from '@material-ui/core/List';
+import ProviderList from './ProviderList';
+import { MEDICAL_PROVIDERS } from '../medical-providers';
 
 const primary = blue[500]; // #F44336
 const FIELD_VALUES = { origin: '', limit: 10 }
@@ -127,13 +129,11 @@ export default function ProviderSearch() {
   const renderProviders = () => {
     const filteredProviders = providers.filter( pr => pr.miles < fields.limit )
     if(filteredProviders.length > 0) {
-      return filteredProviders.map((provider, index) => (
-        <div key={provider.zipcode + `${index}`}>
-          <h5>{provider.providerGroup}</h5>
-          <p>{provider.address}</p>
-          <p>{provider.city}</p>
-        </div>
-      ))
+      return (
+        <List>
+          { filteredProviders.map((provider, index) => <ProviderList {...provider} index={index} />) }
+        </List>
+      )
     } else if (filteredProviders.length === 0) {
       setErrors({ ...errors, noProviders: true })
     }
