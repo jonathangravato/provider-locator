@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-// import { styled } from '@material-ui/styles';
 import { Paper, Grid, Button, TextField, CircularProgress } from '@material-ui/core';
 import blue from '@material-ui/core/colors/blue';
 import axios from 'axios';
@@ -11,24 +10,13 @@ import { MEDICAL_PROVIDERS } from '../medical-providers';
 const primary = blue[500]; // #F44336
 const FIELD_VALUES = { origin: '', limit: 10 }
 const ERROR_VALUES = { originError: false, originText: '', limitError: false, limitText: '', noProviders: false }
-// const TEST_ADDRESS = '505 White St, Daytona Beach, FL 32114'
-
-// const StyledTextField = styled(TextField)({
-//   marginLeft: 8,
-//   marginRight: 8,
-//   marginBottom: 50,
-//   width: 450,
-//   'div:after': {
-//     borderBottom: 'red'
-//   }
-// });
 
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
     width: '30%',
     margin: 'auto',
-    marginTop: 200,
+    marginTop: 150,
     '& label.Mui-focused': {
       color: primary,
     },
@@ -49,8 +37,6 @@ const useStyles = makeStyles(theme => ({
   },
   listWrapper: {
     display: 'flex',
-    width: '80%',
-    margin: 'auto',
     marginTop: 5
   },
   paper: {
